@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 
 from greencompute_backend.main import app
 
-
 client = TestClient(app)
 
 
