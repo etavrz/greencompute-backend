@@ -1,0 +1,15 @@
+Here are some effective ways to reduce your data center's energy usage:
+
+1. **Implement occupancy sensors**: Directly save lighting energy by turning off lights when not in use.
+2. **Use manually controlled zone lighting control**: Save energy with a timer or manual switch, but be aware that this may still leave the lights on after occupants leave.
+3. **Control lighting with a timeclock**: Create pre-defined schedules for when lights are turned on and off to maximize efficiency.
+4. **Install peak shaving devices**: Turn down non-essential lights during periods of low occupancy to save energy.
+
+Additionally, consider implementing other measures such as:
+
+* Energy-efficient cooling systems
+* Efficient power supplies
+* LED lighting upgrades
+* Regular maintenance to ensure equipment is functioning efficiently
+
+By implementing these strategies, you can significantly reduce your data center's energy usage and lower its operating costs.
