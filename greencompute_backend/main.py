@@ -13,7 +13,10 @@ environ = os.getenv("ENVIRON", "dev")
 root_path = "/api/" if environ == "prod" else "/"
 app = FastAPI(root_path=root_path)
 
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    logger.error(f"Could not create tables: {e}")
 
 try:
     client = boto3.client(
