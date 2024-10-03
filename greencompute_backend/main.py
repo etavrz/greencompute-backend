@@ -9,7 +9,9 @@ from sqlalchemy.orm import Session
 from .db.engine import SessionLocal, engine
 from .db.tables import Base, Document
 
-app = FastAPI(root_path="/api/")
+environ = os.getenv("ENVIRON", "dev")
+root_path = "/api/" if environ == "prod" else "/"
+app = FastAPI(root_path=root_path)
 
 Base.metadata.create_all(bind=engine)
 
