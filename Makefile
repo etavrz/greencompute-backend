@@ -15,4 +15,4 @@ make build:
 	docker build -t greencompute-backend .
 
 make docker-run:
-	docker run -p 8000:8000 -d --name gc-backend greencompute-backend
+	docker run -p 8000:8000 -d --name gc-backend --env-file .env greencompute-backend
