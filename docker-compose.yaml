@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  fastapi:
+    build: .
+    ports:
+      - "8000:8000"
+    networks:
+      - mynetwork
+    env_file:
+      - .env
+
+  streamlit:
+    image: greencompute-frontend
+    ports:
+      - "8501:8501"
+    networks:
+      - mynetwork
+
+  nginx:
+    build: ./nginx  # Build Nginx from the Dockerfile in the 'nginx' directory
+    ports:
+      - "80:80"  # Expose port 80 to the host
+    depends_on:
+      - fastapi
+      - streamlit
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

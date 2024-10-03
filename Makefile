@@ -10,3 +10,9 @@ make lint:
 
 make run:
 	poetry run uvicorn greencompute_backend.main:app --reload
+
+make build:
+	docker build -t greencompute-backend .
+
+make docker-run:
+	docker run -p 8000:8000 -d --name gc-backend --env-file .env greencompute-backend
