@@ -76,7 +76,7 @@ jobs:
   deploy-webservice:
     needs: deploy-backend
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.head_commit.message, 'feat') }} || ${{ contains(github.event.head_commit.message, 'fix') }}
+    if: ${{ github.event.head_commit.message matches '^(.*(feat|fix|build).*)$' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
