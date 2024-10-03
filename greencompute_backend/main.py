@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from .db.engine import SessionLocal, engine
 from .db.tables import Base, Document
 
-app = FastAPI()
+app = FastAPI(root_path="/api/")
 
 Base.metadata.create_all(bind=engine)
 
