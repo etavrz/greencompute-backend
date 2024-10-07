@@ -2,6 +2,7 @@ import datetime
 import os
 
 import boto3
+import uvicorn
 from fastapi import Depends, FastAPI
 from loguru import logger
 from sqlalchemy.orm import Session
@@ -10,7 +11,8 @@ from .db.engine import SessionLocal, engine
 from .db.tables import Base, Document
 
 environ = os.getenv("ENVIRON", "dev")
-root_path = "/api/" if environ == "prod" else "/"
+root_path = "/api/" if environ == "prod" else ""
+logger.debug(f"Running on {environ} environment with root path {root_path}")
 app = FastAPI(root_path=root_path)
 
 try:
@@ -71,3 +73,7 @@ def create_document(db: Session = Depends(get_db)):
     doc = document.__dict__
     doc.pop("embeddings")
     return doc
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)
