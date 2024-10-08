@@ -11,7 +11,7 @@ from .db.engine import SessionLocal, engine
 from .db.tables import Base, Document
 
 environ = os.getenv("ENVIRON", "dev")
-root_path = "/api/" if environ == "prod" else ""
+root_path = "/api" if environ == "prod" else ""
 logger.debug(f"Running on {environ} env with root path {root_path}")
 app = FastAPI(root_path=root_path)
 
