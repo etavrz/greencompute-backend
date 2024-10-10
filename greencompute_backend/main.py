@@ -1,43 +1,24 @@
 import datetime
-import os
 
 import boto3
-import uvicorn
 from fastapi import Depends, FastAPI
 from loguru import logger
 from sqlalchemy.orm import Session
 
-from .db.engine import SessionLocal, engine
+from .config import ENVIRON, ROOT_PATH
+from .db.engine import engine
 from .db.tables import Base, Document
+from .resources import get_db, get_s3_client
+from .routes import llm_router, models_router
 
-environ = os.getenv("ENVIRON", "dev")
-root_path = "/api" if environ == "prod" else ""
-logger.debug(f"Running on {environ} env with root path {root_path}")
-app = FastAPI(root_path=root_path)
+logger.debug(f"Running on {ENVIRON} env with root path {ROOT_PATH}")
+app = FastAPI(root_path=ROOT_PATH)
 
+# Table creation
 try:
     Base.metadata.create_all(bind=engine)
 except Exception as e:
     logger.error(f"Could not create tables: {e}")
-
-try:
-    client = boto3.client(
-        "s3",
-        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-        region_name="us-east-1",  # e.g., "us-east-1"
-    )
-except Exception as e:
-    logger.error(f"Could not connect to S3: {e}")
-
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @app.get("/")
@@ -51,7 +32,7 @@ async def health():
 
 
 @app.get("/buckets")
-async def list_buckets():
+async def list_buckets(client: boto3.client = Depends(get_s3_client)):
     response = client.list_buckets()
     return response
 
@@ -75,5 +56,6 @@ def create_document(db: Session = Depends(get_db)):
     return doc
 
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+# Routers
+app.include_router(llm_router)
+app.include_router(models_router)
