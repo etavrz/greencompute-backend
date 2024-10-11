@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from greencompute_backend.config import AWS_S3_BUCKET
@@ -25,5 +25,16 @@ async def root(payload: CarbonPredictionBody):
 async def dummy_model(client=Depends(get_s3_client)):
     response = client.get_object(Bucket=AWS_S3_BUCKET, Key="dummy.txt")
     bytes_response = response["Body"].read()
-    # return the string content of the file
     return {"content": bytes_response.decode("utf-8")}
+
+
+@router.post("/upload")
+async def upload_model(file: UploadFile, client=Depends(get_s3_client)):
+    try:
+        _ = file.file.read()
+        file.file.seek(0)
+        client.upload_fileobj(file.file, AWS_S3_BUCKET, file.filename)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Could not upload file: {e}")
+
+    return {"filename": file.filename}
