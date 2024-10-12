@@ -13,7 +13,7 @@ class Document(Base):
     __tablename__ = "documents"
 
     id = Column(BigInteger, primary_key=True)
-    embeddings = Column(Vector(EMBEDDINGS_DIM))
+    embeddings = Column(Vector(EMBEDDINGS_DIM), nullable=True)
     title = Column(Text)
     url = Column(Text)
     content = Column(Text)

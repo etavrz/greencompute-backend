@@ -24,6 +24,9 @@ pgvector = "^0.3.4"
 psycopg2-binary = "^2.9.9"
 sqlalchemy = "^2.0.35"
 python-multipart = "^0.0.12"
+colpali-engine = "^0.3.0"
+amazon-textract-textractor = "^1.8.3"
+pdf2image = "^1.17.0"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
