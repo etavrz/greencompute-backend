@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from loguru import logger
 
-import greencompute_backend.routes as routers
+import greencompute_backend.services as svc
 
 from .config import ENVIRON, ROOT_PATH
 from .db.engine import engine
@@ -27,6 +27,5 @@ async def health():
     return {"status": "healthy"}
 
 
-app.include_router(routers.llm_router)
-app.include_router(routers.retrieval_router)
-app.include_router(routers.models_router)
+app.include_router(svc.llm_router)
+app.include_router(svc.ml_router)

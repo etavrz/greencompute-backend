@@ -1,19 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
-from pydantic import BaseModel
 
 from greencompute_backend.config import AWS_S3_BUCKET
 from greencompute_backend.resources._aws import get_s3_client
 
-router = APIRouter(prefix="/models", tags=["models"])
+from .models import CarbonPredictionBody, CarbonPredictionResponse
 
-
-class CarbonPredictionBody(BaseModel):
-    memory: float
-    cpu: float
-
-
-class CarbonPredictionResponse(BaseModel):
-    carbon: float
+router = APIRouter(prefix="/ml", tags=["ml"])
 
 
 @router.post("/carbon-footprint", response_model=CarbonPredictionResponse)
