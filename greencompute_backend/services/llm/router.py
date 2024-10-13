@@ -10,7 +10,7 @@ from .svc import PROMPT, fmt_docs, prompt_bedrock, retrieve_docs
 router = APIRouter(prefix="/llm", tags=["llm"])
 
 
-@router.post("/bedrock", response_model=LLMResponse)
+@router.post("/prompt", response_model=LLMResponse)
 def bedrock(prompt: LLMPrompt, client=Depends(get_bedrock_client)):
     return prompt_bedrock(prompt, client)
 
@@ -32,10 +32,3 @@ def rag(
 async def retrieve_documents(request: RetrievalRequest, db: Session = Depends(get_db)):
     results = retrieve_docs(request.query, request.top_k, db)
     return {"documents": results}
-
-
-@router.post("/format")
-async def format_documents(request: RetrievalRequest, db: Session = Depends(get_db)):
-    results = retrieve_docs(request.query, request.top_k, db)
-    results = fmt_docs(results)
-    return {"formatted_documents": results}
