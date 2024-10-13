@@ -2,11 +2,11 @@ from pydantic import BaseModel
 
 
 class LLMPrompt(BaseModel):
-    body: str = "tell me a joke"
+    body: str = "How can I increase my data center efficiency?"
     llm_id: str = "amazon.titan-text-premier-v1:0"
-    max_tokens: int = 256
+    max_tokens: int = 512
     stop_sequences: list = []
-    temperature: float = 0
+    temperature: float = 0.7
     top_p: float = 0.9
 
 
