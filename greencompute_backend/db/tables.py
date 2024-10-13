@@ -13,9 +13,8 @@ class Document(Base):
     __tablename__ = "documents"
 
     id = Column(BigInteger, primary_key=True)
-    embeddings = Column(Vector(EMBEDDINGS_DIM), nullable=True)
-    title = Column(Text)
-    url = Column(Text)
+    embeddings = Column(Vector(EMBEDDINGS_DIM), nullable=True, name=f"embeddings@{EMBEDDINGS_DIM}")
+    doc_title = Column(Text)
     content = Column(Text)
     tokens = Column(Integer)
     date_indexed = mapped_column(DateTime)
