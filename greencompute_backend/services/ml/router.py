@@ -1,11 +1,11 @@
 import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 
-from greencompute_backend.config import AWS_S3_BUCKET, CARBON_MODEL
+from greencompute_backend.config import AWS_S3_BUCKET, CARBON_MODEL, DATA_FILE
 from greencompute_backend.resources._aws import get_s3_client
 
 from .models import CarbonPredictionBody, CarbonPredictionResponse
-from .svc import PredictionService
+from .svc import DataService, PredictionService
 
 router = APIRouter(prefix="/ml", tags=["ml"])
 
@@ -18,11 +18,11 @@ async def root(payload: CarbonPredictionBody):
     return {"carbon": float(prediction)}
 
 
-@router.get("/dummy-model")
-async def dummy_model(client=Depends(get_s3_client)):
-    response = client.get_object(Bucket=AWS_S3_BUCKET, Key="dummy.txt")
-    bytes_response = response["Body"].read()
-    return {"content": bytes_response.decode("utf-8")}
+@router.get("/emissions-data")
+async def emission_data(client=Depends(get_s3_client)):
+    data_svc = DataService(client)
+    data = data_svc.get_data(f"data/{DATA_FILE}")
+    return data
 
 
 @router.post("/upload")
