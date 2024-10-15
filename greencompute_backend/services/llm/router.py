@@ -32,3 +32,7 @@ def rag(
 async def retrieve_documents(request: RetrievalRequest, db: Session = Depends(get_db)):
     results = retrieve_docs(request.query, request.top_k, db)
     return {"documents": results}
+
+
+# @router.post("/stream-rag", response_model=LLMResponse)
+# async def stream_rag(

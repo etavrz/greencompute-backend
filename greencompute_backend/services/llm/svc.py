@@ -64,6 +64,37 @@ def prompt_bedrock(prompt: LLMPrompt, client: object) -> LLMResponse:
     )
 
 
+async def stream_prompt_bedrock(prompt: LLMPrompt, client: object) -> LLMResponse:
+    """Create a payload for the bedrock client and return the response.
+
+    Args:
+        prompt (LLMPrompt): Prompt object.
+        client (object): Bedrock client.
+
+    Returns:
+        LLMResponse: Response from the bedrock client.
+    """
+    body = json.dumps(
+        {
+            "inputText": prompt.body,
+            "textGenerationConfig": {
+                "maxTokenCount": prompt.max_tokens,
+                "stopSequences": prompt.stop_sequences,
+                "temperature": prompt.temperature,
+                "topP": prompt.top_p,
+            },
+        }
+    )
+    # Invoke the model with the request.
+    streaming_response = client.invoke_model_with_response_stream(modelId=prompt.llm_id, body=body)
+    # response_body = json.loads(response.get("body").read())
+    # return LLMResponse(
+    #     body=response_body.get("results")[0].get("outputText"),
+    #     llm_id=prompt.llm_id,
+    # )
+    return streaming_response
+
+
 def retrieve_docs(query: str, top_k: int = 10, db: Session = Depends(get_db)) -> list[DocumentResponse]:
     """Document retrieval based on embedded query.
 
