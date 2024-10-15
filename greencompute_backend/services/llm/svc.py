@@ -1,7 +1,7 @@
 import json
 
 from fastapi import Depends
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
