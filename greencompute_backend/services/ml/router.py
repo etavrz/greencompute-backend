@@ -1,5 +1,6 @@
 import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from loguru import logger
 
 from greencompute_backend.config import AWS_S3_BUCKET, CARBON_MODEL, DATA_FILE
 from greencompute_backend.resources._aws import get_s3_client
@@ -9,7 +10,10 @@ from .svc import DataService, PredictionService
 
 router = APIRouter(prefix="/ml", tags=["ml"])
 
-emissions_model = PredictionService(CARBON_MODEL, get_s3_client())
+try:
+    emissions_model = PredictionService(CARBON_MODEL, get_s3_client())
+except Exception as e:
+    logger.error(f"Could not load model: {e}")
 
 
 @router.post("/carbon-emissions", response_model=CarbonPredictionResponse)
