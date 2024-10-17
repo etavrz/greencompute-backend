@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from greencompute_backend.db.tables import Document
 from greencompute_backend.resources import get_db
 
-from .models import DocumentResponse, LLMPrompt, LLMResponse
+from .models import DocumentResponse, LLMPrompt
 
 EMBEDDINGS_MODEL = "BAAI/bge-base-en-v1.5"
 KEYS = ["doc_title", "content"]
@@ -30,7 +30,7 @@ Question:
 embeddings_model = HuggingFaceEmbeddings(model_name=EMBEDDINGS_MODEL)
 
 
-def prompt_bedrock(prompt: LLMPrompt, client: object) -> LLMResponse:
+def prompt_bedrock(prompt: LLMPrompt, client: object) -> dict[str, str]:
     """Create a payload for the bedrock client and return the response.
 
     Args:
@@ -38,7 +38,7 @@ def prompt_bedrock(prompt: LLMPrompt, client: object) -> LLMResponse:
         client (object): Bedrock client.
 
     Returns:
-        LLMResponse: Response from the bedrock client.
+        dict[str, str]: Response from the bedrock client.
     """
     body = json.dumps(
         {
@@ -58,10 +58,10 @@ def prompt_bedrock(prompt: LLMPrompt, client: object) -> LLMResponse:
         contentType="application/json",
     )
     response_body = json.loads(response.get("body").read())
-    return LLMResponse(
-        body=response_body.get("results")[0].get("outputText"),
-        llm_id=prompt.llm_id,
-    )
+    return {
+        "response": response_body.get("results")[0].get("outputText"),
+        "llm_id": prompt.llm_id,
+    }
 
 
 def retrieve_docs(query: str, top_k: int = 10, db: Session = Depends(get_db)) -> list[DocumentResponse]:
