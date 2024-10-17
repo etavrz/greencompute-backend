@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-from loguru import logger
 from sqlalchemy.orm import Session
 
 from greencompute_backend.resources import get_bedrock_client, get_db
@@ -23,9 +22,10 @@ def rag(
 ):
     docs = retrieve_docs(prompt.body, top_k=10, db=db_client)
     docs_formatted = fmt_docs(docs)
-    logger.debug(f"Formatted documents: {docs_formatted}")
     prompt.body = PROMPT.format(context=docs_formatted, question=prompt.body)
-    return prompt_bedrock(prompt, bedrock_client)
+    bedrock_response = prompt_bedrock(prompt, bedrock_client)
+
+    return LLMResponse(context=docs, **bedrock_response)
 
 
 @router.post("/retrieval", response_model=RetrievalResponse)
