@@ -22,6 +22,7 @@ class LLMPrompt(BaseModel):
     stop_sequences: list = []
     temperature: float = 0.7
     top_p: float = 0.9
+    top_k: int = 10
 
 
 class LLMResponse(BaseModel):
