@@ -162,7 +162,7 @@ cython_debug/
 #.idea/
 /data
 *.png
-/extraction
-.vector_db/
 *.csv
+.vector_db/
 .deepeval*
+extraction/
