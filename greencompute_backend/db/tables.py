@@ -15,6 +15,7 @@ class Document(Base):
     id = Column(BigInteger, primary_key=True)
     embeddings = Column(Vector(EMBEDDINGS_DIM), nullable=True, name=f"embeddings@{EMBEDDINGS_DIM}")
     doc_title = Column(Text)
+    url = Column(Text, nullable=True)
     content = Column(Text)
     tokens = Column(Integer)
     date_indexed = mapped_column(DateTime)

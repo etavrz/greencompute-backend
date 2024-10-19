@@ -24,7 +24,9 @@ async def rag(
     docs = await retrieve_docs(prompt.body, top_k=prompt.top_k, db=db_client)
     docs_formatted = fmt_docs(docs)
     prompt.body = PROMPT.format(context=docs_formatted, question=prompt.body)
-    return prompt_bedrock(prompt, bedrock_client)
+    bedrock_response = prompt_bedrock(prompt, bedrock_client)
+
+    return LLMResponse(context=docs, **bedrock_response)
 
 
 @router.post("/retrieval", response_model=RetrievalResponse)
