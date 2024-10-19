@@ -1,6 +1,7 @@
 import json
+from contextlib import asynccontextmanager
 
-from fastapi import Depends
+from fastapi import Depends, FastAPI
 from langchain_huggingface import HuggingFaceEmbeddings
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -27,7 +28,21 @@ Question:
 {question}
 """
 
-embeddings_model = HuggingFaceEmbeddings(model_name=EMBEDDINGS_MODEL)
+embeddings = {}
+
+
+def embed(query: str):
+    embeddings_model = HuggingFaceEmbeddings(model_name=EMBEDDINGS_MODEL)
+    return embeddings_model.embed_query(query)
+
+
+@asynccontextmanager
+async def lifespan_embeddings(app: FastAPI):
+    # Load the embeddings model
+    embeddings[EMBEDDINGS_MODEL] = embed
+    yield
+    # Clean up the embeddings model and release the resources
+    embeddings.clear()
 
 
 def prompt_bedrock(prompt: LLMPrompt, client: object) -> dict[str, str]:
@@ -106,7 +121,7 @@ async def retrieve_docs(query: str, top_k: int = 10, db: Session = Depends(get_d
     Returns:
             list[DocumentResponse]: List of documents.
     """
-    q_embed = embeddings_model.embed_query(query)
+    q_embed = embeddings[EMBEDDINGS_MODEL](query)
     result = db.scalars(select(Document).order_by(Document.embeddings.l2_distance(q_embed).desc()).limit(top_k))
     results = [r.__dict__ for r in result.fetchall()]
     results = [{k: v for k, v in r.items() if k in KEYS} for r in results]

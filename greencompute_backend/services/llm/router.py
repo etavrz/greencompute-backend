@@ -5,13 +5,13 @@ from sqlalchemy.orm import Session
 from greencompute_backend.resources import get_bedrock_client, get_db
 
 from .models import LLMPrompt, LLMResponse, RetrievalRequest, RetrievalResponse
-from .svc import PROMPT, fmt_docs, prompt_bedrock, retrieve_docs, stream_prompt_bedrock
+from .svc import PROMPT, fmt_docs, lifespan_embeddings, prompt_bedrock, retrieve_docs, stream_prompt_bedrock
 
-router = APIRouter(prefix="/llm", tags=["llm"])
+router = APIRouter(prefix="/llm", tags=["llm"], lifespan=lifespan_embeddings)
 
 
-@router.post("/prompt", response_model=LLMResponse)
-def bedrock(prompt: LLMPrompt, client=Depends(get_bedrock_client)):
+@router.post("/prompt")
+def bedrock(prompt: LLMPrompt, client=Depends(get_bedrock_client)) -> dict[str, str]:
     return prompt_bedrock(prompt, client)
 
 
@@ -31,7 +31,7 @@ async def rag(
 
 @router.post("/retrieval", response_model=RetrievalResponse)
 async def retrieve_documents(request: RetrievalRequest, db: Session = Depends(get_db)):
-    results = retrieve_docs(request.query, request.top_k, db)
+    results = await retrieve_docs(request.query, request.top_k, db)
     return {"documents": results}
 
 
