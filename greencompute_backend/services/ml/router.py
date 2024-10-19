@@ -1,6 +1,7 @@
+from contextlib import asynccontextmanager
+
 import numpy as np
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
-from loguru import logger
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, UploadFile
 
 from greencompute_backend.config import AWS_S3_BUCKET, CARBON_MODEL, DATA_FILE
 from greencompute_backend.resources._aws import get_s3_client
@@ -8,17 +9,24 @@ from greencompute_backend.resources._aws import get_s3_client
 from .models import CarbonPredictionBody, CarbonPredictionResponse
 from .svc import DataService, PredictionService
 
-router = APIRouter(prefix="/ml", tags=["ml"])
+models = {}
 
-try:
-    emissions_model = PredictionService(CARBON_MODEL, get_s3_client())
-except Exception as e:
-    logger.error(f"Could not load model: {e}")
+
+@asynccontextmanager
+async def lifespan_models(app: FastAPI):
+    # Load the embeddings model
+    models["carbon-emissions"] = PredictionService(CARBON_MODEL, get_s3_client())
+    yield
+    # Clean up the embeddings model and release the resources
+    models.clear()
+
+
+router = APIRouter(prefix="/ml", tags=["ml"], lifespan=lifespan_models)
 
 
 @router.post("/carbon-emissions", response_model=CarbonPredictionResponse)
 async def root(payload: CarbonPredictionBody):
-    prediction = emissions_model.predict(np.array([[payload.memory, payload.cpu]]))[0]
+    prediction = models["carbon-emissions"].predict(np.array([[payload.memory, payload.cpu]]))[0]
     return {"carbon": float(prediction)}
 
 
