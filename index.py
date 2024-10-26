@@ -1,11 +1,12 @@
 import datetime
+import json
 import os
 import pathlib
 
 import tqdm
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_core.documents import Document as LCDocument
+from langchain_huggingface import HuggingFaceEmbeddings
 from loguru import logger
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -71,11 +72,27 @@ def chunk_text(
     Returns:
         list[Document]: List of documents with the chunked text.
     """
+    MARKDOWN_SEPARATORS = [
+        "\n#{1,6} ",
+        "```\n",
+        "\n\\*\\*\\*+\n",
+        "\n---+\n",
+        "\n___+\n",
+        "\n\n",
+        "\n",
+        " ",
+        "",
+    ]
     tokenizer = AutoTokenizer.from_pretrained(EMBEDDINGS_MODEL)
 
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size, chunk_overlap=chunk_overlap
-    ).from_huggingface_tokenizer(tokenizer=tokenizer)
+    text_splitter = RecursiveCharacterTextSplitter.from_huggingface_tokenizer(
+        tokenizer=tokenizer,
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        add_start_index=True,  # If `True`, includes chunk's start index in metadata
+        strip_whitespace=True,  # If `True`, strips whitespace from the start and end of every document
+        separators=MARKDOWN_SEPARATORS,
+    )
 
     docs = text_splitter.create_documents([text], metadatas=[doc_meta.model_dump()])
     logger.info(f"Created {len(docs)} splits")
@@ -121,11 +138,28 @@ def save_embeddings(embeddings: list[str], docs: list[LCDocument]):
             )
             session.add(doc)
         session.commit()
-    logger.info("Embeddings saved to database.")
+    logger.success("Embeddings saved to database.")
+    return True
 
 
 if __name__ == "__main__":
     data_directory = pathlib.Path("data")
+
+    # Metadata for the documents
+    with open(str(data_directory / "urls.json"), "r") as file:
+        urls = json.load(file)["document_urls"]
+
     counter = 0
+    chunk_size, chunk_overlap = 400, 40
+
     for pdf in tqdm.tqdm(list(data_directory.glob("*.pdf"))):
         text = text_extraction(pdf)
+        url = next((item for item in urls if item["document_title"] in pdf.name), None)
+        chunked_text = chunk_text(
+            text=text,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            doc_meta=DocumentMetadata(title=pdf.stem, url=url["url"]),
+        )
+        embeddings = embed_text(chunked_text)
+        save_embeddings(embeddings, chunked_text)

@@ -166,3 +166,4 @@ cython_debug/
 .vector_db/
 .deepeval*
 extraction/
+*.xlsx
