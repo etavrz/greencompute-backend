@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, FastAPI, HTTPException, UploadFile
 from greencompute_backend.config import AWS_S3_BUCKET, DATA_FILE, MODELS
 from greencompute_backend.resources._aws import get_s3_client
 
-from .models import CarbonPredictionBody, CarbonPredictionResponse
+from .models import CarbonPredictionBody, ITElectricityBody, PredictionResponse, PUEBody
 from .svc import DataService, PredictionService
 
 models = {}
@@ -25,25 +25,25 @@ async def lifespan_models(app: FastAPI):
 router = APIRouter(prefix="/ml", tags=["ml"], lifespan=lifespan_models)
 
 
-@router.post("/carbon-emissions", response_model=CarbonPredictionResponse)
+@router.post("/carbon-emissions", response_model=PredictionResponse)
 async def root(payload: CarbonPredictionBody):
     prediction = models["carbon-emissions"].predict(np.array([[payload.memory, payload.cpu]]))[0]
-    return {"carbon": float(prediction)}
+    return {"prediction": float(prediction), "features": payload.model_dump()}
 
 
-@router.post("/it-electricity")
-async def it_electricity():
-    return {"carbon": 0.5}
+@router.post("/it-electricity", response_model=PredictionResponse)
+async def it_electricity(payload: ITElectricityBody):
+    return {"prediction": 0.5, "features": payload.model_dump()}
 
 
-@router.post("/active-idle")
-async def active_idle():
-    return {"carbon": 0.5}
+@router.post("/active-idle", response_model=PredictionResponse)
+async def active_idle(payload: ITElectricityBody):
+    return {"prediction": 0.5, "features": payload.model_dump()}
 
 
-@router.post("/pue")
-async def pue():
-    return {"carbon": 0.5}
+@router.post("/pue", response_model=PredictionResponse)
+async def pue(payload: PUEBody):
+    return {"prediction": 0.5, "features": payload.model_dump()}
 
 
 @router.get("/emissions-data")
