@@ -11,10 +11,10 @@ class PredictionService:
         self.s3_client = s3_client
         self.model = self._download_model(model_name)
 
-    def _download_model(self, model_name: str):
-        response = self.s3_client.get_object(Bucket=AWS_S3_BUCKET, Key=model_name)
+    def _download_model(self, model_name: str, model_prefix: str = "models"):
+        response = self.s3_client.get_object(Bucket=AWS_S3_BUCKET, Key=f"{model_prefix}/{model_name}")
         model_bytes = response["Body"].read()
-        logger.debug("✅ Successfully downloaded model from S3")
+        logger.debug(f"✅ Successfully downloaded model {model_name} from S3")
         return pickle.loads(model_bytes)
 
     def predict(self, data):
