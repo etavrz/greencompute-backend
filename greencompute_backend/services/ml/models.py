@@ -11,7 +11,7 @@ class CarbonPredictionBody(BaseModel):
 class ITElectricityBody(BaseModel):
     memory: float = 10
     cores: float = 10
-    chips: float = 10
+    cpu: float = 10
 
 
 class PUEBody(BaseModel):
