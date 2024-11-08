@@ -12,7 +12,7 @@ from greencompute_backend.resources import get_db
 from .models import DocumentResponse, LLMPrompt
 
 EMBEDDINGS_MODEL = "BAAI/bge-base-en-v1.5"
-KEYS = ["doc_title", "content"]
+KEYS = ["doc_title", "content", "url"]
 PROMPT = """
 Using the information contained in the context,
 give a comprehensive answer to the question.

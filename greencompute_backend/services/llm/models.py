@@ -9,6 +9,7 @@ class RetrievalRequest(BaseModel):
 class DocumentResponse(BaseModel):
     doc_title: str
     content: str
+    url: str
 
 
 class RetrievalResponse(BaseModel):
