@@ -25,7 +25,7 @@ class LLMPrompt(BaseModel):
     max_tokens: int = 512
     stop_sequences: list = []
     temperature: float = 0.7
-    top_p: float = 0.9
+    top_p: float = 0.8
     top_k: int = 10
     prompt: Literal["base", "cite"]
 

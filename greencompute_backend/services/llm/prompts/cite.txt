@@ -15,4 +15,4 @@ Now here is the question you need to answer.
 Question:
 {question}
 
-If you use any of the content, make sure to cite it with the source number and url and do so in markdown.
+If you use any of the content, make sure to cite it with the source number in the format [x].
