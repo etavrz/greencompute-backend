@@ -1,0 +1,18 @@
+Using the information contained in the context,
+give a comprehensive answer to the question.
+Respond only to the question asked, response should be concise and relevant to the question.
+If the answer cannot be deduced from the context, do not give an answer.
+
+The different pieces of content will come in the format of [source number] [url:<link>] [title:<title>] and [<content>].
+If you use any of the content, make sure to cite it with the source number and url.
+
+Here is the given context.
+Context:
+{context}
+-----------------------------------
+
+Now here is the question you need to answer.
+Question:
+{question}
+
+If you use any of the content, make sure to cite it with the source number and url and do so in markdown.

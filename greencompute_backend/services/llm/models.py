@@ -1,9 +1,12 @@
+from typing import Literal
+
 from pydantic import BaseModel
 
 
 class RetrievalRequest(BaseModel):
     query: str
     top_k: int = 10
+    format: bool = False
 
 
 class DocumentResponse(BaseModel):
@@ -13,7 +16,7 @@ class DocumentResponse(BaseModel):
 
 
 class RetrievalResponse(BaseModel):
-    documents: list[DocumentResponse]
+    documents: list[DocumentResponse] | str
 
 
 class LLMPrompt(BaseModel):
@@ -24,6 +27,7 @@ class LLMPrompt(BaseModel):
     temperature: float = 0.7
     top_p: float = 0.9
     top_k: int = 10
+    prompt: Literal["base", "cite"]
 
 
 class LLMResponse(BaseModel):

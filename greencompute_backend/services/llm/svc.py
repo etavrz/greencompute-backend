@@ -1,5 +1,7 @@
 import json
+import pathlib
 from contextlib import asynccontextmanager
+from typing import Literal
 
 from fastapi import Depends, FastAPI
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -8,8 +10,7 @@ from sqlalchemy.orm import Session
 
 from greencompute_backend.db.tables import Document
 from greencompute_backend.resources import get_db
-
-from .models import DocumentResponse, LLMPrompt
+from greencompute_backend.services.llm.models import DocumentResponse, LLMPrompt
 
 EMBEDDINGS_MODEL = "BAAI/bge-base-en-v1.5"
 KEYS = ["doc_title", "content", "url"]
@@ -131,6 +132,18 @@ async def retrieve_docs(query: str, top_k: int = 10, db: Session = Depends(get_d
 
 def fmt_docs(docs: list[DocumentResponse]):
     context = ""
-    for doc in docs:
-        context += f"{doc.doc_title}\n{doc.content}\n\n"
+    for i, doc in enumerate(docs):
+        context += f"[{i + 1}]. [url: {doc.url}]. [title: {doc.doc_title}]\n{doc.content}\n\n"
     return context
+
+
+def select_prompt(prompt: Literal["base", "cite"]) -> str:
+    _dir = pathlib.Path(__file__).parent
+    with open(f"{str(_dir)}/prompts/{prompt}.txt", "r") as f:
+        return f.read()
+
+
+if __name__ == "__main__":
+    import pathlib
+
+    print(pathlib.Path(__file__))
