@@ -33,12 +33,14 @@ async def root(payload: CarbonPredictionBody):
 
 @router.post("/it-electricity", response_model=PredictionResponse)
 async def it_electricity(payload: ITElectricityBody):
-    return {"prediction": 0.5, "features": payload.model_dump()}
+    prediction = models["it-electricity"].predict(np.array([[payload.memory, payload.cores, payload.cpu]]))[0]
+    return {"prediction": prediction, "features": payload.model_dump()}
 
 
 @router.post("/active-idle", response_model=PredictionResponse)
 async def active_idle(payload: ITElectricityBody):
-    return {"prediction": 0.5, "features": payload.model_dump()}
+    prediction = models["active-idle"].predict(np.array([[payload.memory, payload.cores, payload.cpu]]))[0]
+    return {"prediction": prediction, "features": payload.model_dump()}
 
 
 @router.post("/pue", response_model=PredictionResponse)
