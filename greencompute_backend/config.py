@@ -13,7 +13,7 @@ MODELS = {
     "carbon-emissions": "xgb_carbon_model.pkl",
     "it-electricity": "gbr_it_electricity_model.pkl",
     "active-idle": "rf_activeidle_model.pkl",
-    "pue": "xgb_pue_model.pkl",
+    "pue": "xgb_pue_sklearn.pkl",
 }
 CARBON_MODEL = "xgb_carbon_model.pkl"
 

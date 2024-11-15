@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 import numpy as np
+import pandas as pd
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, UploadFile
 
 from greencompute_backend.config import AWS_S3_BUCKET, DATA_FILE, MODELS
@@ -45,7 +46,10 @@ async def active_idle(payload: ITElectricityBody):
 
 @router.post("/pue", response_model=PredictionResponse)
 async def pue(payload: PUEBody):
-    return {"prediction": 0.5, "features": payload.model_dump()}
+    # Format the data and make the prediction
+    df = pd.DataFrame({"Cooling System": [payload.cooling_system], "state_name": [payload.state_name]})
+    prediction = models["pue"].predict(df)[0]
+    return {"prediction": prediction, "features": payload.model_dump()}
 
 
 @router.get("/emissions-data")

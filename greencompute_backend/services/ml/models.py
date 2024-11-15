@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CarbonPredictionBody(BaseModel):
@@ -15,9 +15,8 @@ class ITElectricityBody(BaseModel):
 
 
 class PUEBody(BaseModel):
-    state: str = "New York"
-    cooler: str = "Air"
-    economizer: str = "No"
+    state_name: str = "New York"
+    cooling_system: str = Field("Air-cooled chiller", alias="Cooling System")
 
 
 class PredictionResponse(BaseModel):
