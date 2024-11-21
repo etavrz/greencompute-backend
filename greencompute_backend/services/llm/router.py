@@ -24,7 +24,7 @@ def bedrock(prompt: LLMPrompt, client=Depends(get_bedrock_client)) -> dict[str, 
 
 @router.post("/retrieval", response_model=RetrievalResponse)
 async def retrieve_documents(request: RetrievalRequest, db: Session = Depends(get_db)):
-    results = await retrieve_docs(request.query, request.top_k, db)
+    results = await retrieve_docs(request.query, request.top_n, db)
     if request.format:
         return {"documents": fmt_docs(results)}
     return {"documents": results}
@@ -36,7 +36,7 @@ async def rag(
     bedrock_client=Depends(get_bedrock_client),
     db_client=Depends(get_db),
 ):
-    docs = await retrieve_docs(prompt.body, top_k=prompt.top_k, db=db_client)
+    docs = await retrieve_docs(prompt.body, top_n=prompt.top_n, db=db_client)
     docs_formatted = fmt_docs(docs)
     prompt.body = select_prompt(prompt.prompt).format(context=docs_formatted, question=prompt.body)
     bedrock_response = prompt_bedrock(prompt, bedrock_client)
@@ -46,7 +46,7 @@ async def rag(
 
 @router.post("/stream-rag", response_model=LLMResponse)
 async def stream_rag(prompt: LLMPrompt, client=Depends(get_bedrock_client), db=Depends(get_db)):
-    docs = await retrieve_docs(prompt.body, top_k=prompt.top_k, db=db)
+    docs = await retrieve_docs(prompt.body, top_n=prompt.top_n, db=db)
     docs_formatted = fmt_docs(docs)
     prompt.body = select_prompt(prompt.prompt).format(context=docs_formatted, question=prompt.body)
     return StreamingResponse(stream_prompt_bedrock(prompt, client))

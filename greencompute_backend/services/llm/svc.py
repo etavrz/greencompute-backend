@@ -111,19 +111,19 @@ def stream_prompt_bedrock(prompt: LLMPrompt, client: object):
             yield chunk["outputText"]
 
 
-async def retrieve_docs(query: str, top_k: int = 10, db: Session = Depends(get_db)) -> list[DocumentResponse]:
+async def retrieve_docs(query: str, top_n: int = 10, db: Session = Depends(get_db)) -> list[DocumentResponse]:
     """Document retrieval based on embedded query.
 
     Args:
             query (str): Query to search for.
-            top_k (int, optional): Number of top documents to return. Defaults to 10.
+            top_n (int, optional): Number of top documents to return. Defaults to 10.
             db (Session, optional): Document session . Defaults to Depends(get_db).
 
     Returns:
             list[DocumentResponse]: List of documents.
     """
     q_embed = embeddings[EMBEDDINGS_MODEL](query)
-    result = db.scalars(select(Document).order_by(Document.embeddings.l2_distance(q_embed).desc()).limit(top_k))
+    result = db.scalars(select(Document).order_by(Document.embeddings.l2_distance(q_embed).desc()).limit(top_n))
     results = [r.__dict__ for r in result.fetchall()]
     results = [{k: v for k, v in r.items() if k in KEYS} for r in results]
     results = [DocumentResponse(**r) for r in results]

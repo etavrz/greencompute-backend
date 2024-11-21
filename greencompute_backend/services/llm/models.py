@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class RetrievalRequest(BaseModel):
     query: str
-    top_k: int = 10
+    top_n: int = 20
     format: bool = False
 
 
@@ -24,9 +24,9 @@ class LLMPrompt(BaseModel):
     llm_id: str = "amazon.titan-text-premier-v1:0"
     max_tokens: int = 512
     stop_sequences: list = []
-    temperature: float = 0.7
-    top_p: float = 0.8
-    top_k: int = 10
+    temperature: float = 0.3
+    top_p: float = 0.7
+    top_n: int = 20
     prompt: Literal["base", "cite"]
 
 
