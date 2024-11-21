@@ -167,3 +167,5 @@ cython_debug/
 .deepeval*
 extraction/
 *.xlsx
+*/output/
+*/synthetics/
